@@ -1,0 +1,109 @@
+You are a senior frontend engineer and product designer.
+
+Build a mobile-first Progressive Web App (PWA) using:
+- React + TypeScript (Vite)
+- Modern CSS (CSS modules or Tailwind)
+- No backend initially (use localStorage)
+- Optimized for iOS Safari and Add-to-Home-Screen PWA behavior
+
+APP IDEA:
+Create a Monthly & Yearly Budget Tracker app for iOS PWA users.
+
+REFERENCE UI:
+Use the attached image as a visual reference for:
+- Dark theme background
+- Soft neon green primary color
+- Rounded cards
+- Minimal, modern, iOS-style design
+- Smooth spacing, shadows, and animations
+DO NOT copy branding or icons exactly, only the style language.
+
+CORE FEATURES:
+
+1) HOME / MONTHLY BUDGET SCREEN (Default Tab)
+- Header shows:
+  - "Account Balance"
+  - Total balance (Income - Expenses)
+  - Month selector (Previous / Next)
+- Two main cards:
+  - Income card (green gradient)
+  - Expenses card (dark gradient)
+- Monthly progress indicator (remaining days)
+
+2) BUDGET CATEGORIES
+- List of categories like:
+  - Food
+  - Travel
+  - Rent
+  - Entertainment
+- Each category shows:
+  - Budgeted amount
+  - Spent amount
+  - Progress bar
+- Allow user to:
+  - Add new category
+  - Edit or delete category
+- Categories should be stored per month
+
+3) TRANSACTIONS LIST (per category)
+- When tapping a category:
+  - Show list of expenses
+  - Each expense includes:
+    - Amount
+    - Date
+    - Optional note
+- Ability to add/delete transactions
+- Auto-update totals
+
+4) YEARLY TAB
+- Separate tab showing:
+  - Monthly summary cards (Jan–Dec)
+  - Total income vs expense per month
+  - Simple bar or card-based visualization
+- No heavy charts; keep it clean and readable
+
+5) BOTTOM NAVIGATION (iOS style)
+Tabs:
+- Budget (Monthly)
+- Transactions
+- Accounts (summary)
+- Insights (Yearly view)
+
+6) ADD BUTTON (Floating Action Button)
+- Bottom-right floating "+" button
+- Opens modal:
+  - Add income
+  - Add expense
+  - Select category
+  - Select date
+- Smooth modal animation
+
+TECHNICAL REQUIREMENTS:
+- Mobile-first layout (max-width: 430px)
+- Touch-friendly buttons
+- Smooth transitions
+- Persist data using localStorage
+- Clean folder structure
+- Use reusable components
+- Include PWA support:
+  - manifest.json
+  - app icons
+  - service worker
+  - display: standalone
+  - theme color matching UI
+
+COLOR & UI STYLE:
+- Background: near-black / dark charcoal
+- Primary: soft mint green
+- Accent: subtle gradients
+- Cards: rounded, elevated
+- Typography: clean, readable, modern
+- No clutter
+
+DELIVERABLE:
+- Fully runnable Replit project
+- Clean code with comments
+- PWA-ready
+- iOS Add-to-Home-Screen friendly
+
+Build the complete app structure and UI first, then logic.
