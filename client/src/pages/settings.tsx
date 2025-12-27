@@ -3,16 +3,45 @@ import { ChevronLeft } from "lucide-react";
 import { useLocation } from "wouter";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CURRENCIES, getCurrency, setCurrency } from "@/lib/storage";
+import { Input } from "@/components/ui/input";
+import { CURRENCIES, getCurrency, setCurrency, getMonthlyBudget, setMonthlyBudget } from "@/lib/storage";
 import { BottomNav } from "@/components/bottom-nav";
+import { format } from "date-fns";
+import { useToast } from "@/hooks/use-toast";
 
 export default function SettingsPage() {
   const [, setLocation] = useLocation();
   const [selectedCurrency, setSelectedCurrency] = useState(getCurrency());
+  const [monthlyBudgets, setMonthlyBudgets] = useState<Record<string, number>>({});
+  const [isLoading, setIsLoading] = useState(true);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    const loadBudgets = async () => {
+      // Load current and nearby months
+      const now = new Date();
+      for (let i = -1; i <= 1; i++) {
+        const d = new Date(now);
+        d.setMonth(d.getMonth() + i);
+        const yearMonth = format(d, "yyyy-MM");
+        const limit = await getMonthlyBudget(yearMonth);
+        setMonthlyBudgets(prev => ({ ...prev, [yearMonth]: limit }));
+      }
+      setIsLoading(false);
+    };
+    loadBudgets();
+  }, []);
 
   const handleCurrencyChange = (code: string) => {
     setSelectedCurrency(code);
     setCurrency(code);
+  };
+
+  const handleBudgetChange = async (yearMonth: string, limit: number) => {
+    if (limit < 0) return;
+    const newLimit = await setMonthlyBudget(yearMonth, limit);
+    setMonthlyBudgets(prev => ({ ...prev, [yearMonth]: newLimit }));
+    toast({ title: "Budget updated", description: `Monthly budget for ${yearMonth} has been saved.` });
   };
 
   return (
@@ -65,6 +94,34 @@ export default function SettingsPage() {
                 </Card>
               </button>
             ))}
+          </div>
+        </div>
+
+        {/* Monthly Budget Settings */}
+        <div>
+          <h2 className="text-lg font-semibold mb-4 text-white/80">Monthly Spending Limits</h2>
+          <div className="space-y-3">
+            {isLoading ? (
+              <div className="space-y-2">
+                {[1, 2, 3].map(i => <div key={i} className="h-12 bg-white/5 rounded-lg animate-pulse" />)}
+              </div>
+            ) : (
+              Object.entries(monthlyBudgets).map(([yearMonth, limit]) => (
+                <div key={yearMonth} className="flex items-center gap-3">
+                  <span className="text-sm font-medium text-white/60 min-w-[100px]">{yearMonth}</span>
+                  <div className="flex-1 relative">
+                    <span className="absolute left-3 top-2.5 text-muted-foreground text-sm">₹</span>
+                    <Input
+                      type="number"
+                      value={limit}
+                      onChange={(e) => handleBudgetChange(yearMonth, Number(e.target.value))}
+                      className="pl-7 bg-card border-white/5 rounded-lg"
+                      data-testid={`input-budget-${yearMonth}`}
+                    />
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </div>
 

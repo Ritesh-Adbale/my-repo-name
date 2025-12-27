@@ -31,6 +31,21 @@ export const api = {
         200: z.custom<{ code: string; symbol: string; name: string }>(),
       },
     },
+    getMonthlyBudget: {
+      method: 'GET' as const,
+      path: '/api/settings/monthly-budget/:yearMonth',
+      responses: {
+        200: z.custom<{ yearMonth: string; limit: number }>(),
+      },
+    },
+    setMonthlyBudget: {
+      method: 'POST' as const,
+      path: '/api/settings/monthly-budget',
+      input: z.object({ yearMonth: z.string(), limit: z.coerce.number() }),
+      responses: {
+        200: z.custom<{ yearMonth: string; limit: number }>(),
+      },
+    },
   },
   categories: {
     list: {
@@ -85,7 +100,7 @@ export const api = {
       },
     },
     update: {
-      method: 'PUT' as const,
+      method: 'PATCH' as const,
       path: '/api/transactions/:id',
       input: insertTransactionSchema.partial(),
       responses: {

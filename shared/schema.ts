@@ -63,3 +63,13 @@ export interface CurrencyPreference {
 
 export type GetCurrencyResponse = CurrencyPreference;
 export type SetCurrencyRequest = { code: CurrencyCode };
+
+// === MONTHLY BUDGET TYPES ===
+export interface MonthlyBudget {
+  yearMonth: string; // Format: "2024-03"
+  limit: number;
+}
+
+export type GetMonthlyBudgetRequest = { yearMonth: string };
+export type SetMonthlyBudgetRequest = { yearMonth: string; limit: number };
+export type GetMonthlyBudgetResponse = MonthlyBudget;

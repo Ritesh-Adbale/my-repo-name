@@ -1,4 +1,4 @@
-import { Plus } from "lucide-react";
+import { Plus, X } from "lucide-react";
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -6,13 +6,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useCategories } from "@/hooks/use-categories";
-import { useCreateTransaction } from "@/hooks/use-transactions";
+import { useCreateTransaction, useUpdateTransaction } from "@/hooks/use-transactions";
 import { useToast } from "@/hooks/use-toast";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { insertTransactionSchema } from "@shared/schema";
+import type { Transaction } from "@shared/schema";
 
 const formSchema = insertTransactionSchema.extend({
   amount: z.coerce.number().min(0.01, "Amount must be greater than 0"),
@@ -22,10 +23,16 @@ const formSchema = insertTransactionSchema.extend({
 
 type FormValues = z.infer<typeof formSchema>;
 
-export function TransactionFab() {
+interface TransactionFabProps {
+  editingTransaction?: Transaction | null;
+  onEditingChange?: (transaction: Transaction | null) => void;
+}
+
+export function TransactionFab({ editingTransaction, onEditingChange }: TransactionFabProps) {
   const [open, setOpen] = useState(false);
   const { data: categories } = useCategories();
-  const { mutate: createTransaction, isPending } = useCreateTransaction();
+  const { mutate: createTransaction, isPending: isCreating } = useCreateTransaction();
+  const { mutate: updateTransaction, isPending: isUpdating } = useUpdateTransaction();
   const { toast } = useToast();
 
   const form = useForm<FormValues>({
@@ -38,38 +45,82 @@ export function TransactionFab() {
     },
   });
 
+  const handleOpenChange = (newOpen: boolean) => {
+    setOpen(newOpen);
+    if (!newOpen) {
+      form.reset();
+      onEditingChange?.(null);
+    }
+  };
+
   function onSubmit(data: FormValues) {
-    createTransaction(
-      { 
-        ...data, 
-        amount: data.amount.toString(), 
-      },
-      {
-        onSuccess: () => {
-          setOpen(false);
-          form.reset();
-          toast({ title: "Transaction added", description: "Your transaction has been saved." });
-        },
-        onError: () => {
-          toast({ title: "Error", description: "Failed to save transaction.", variant: "destructive" });
+    if (editingTransaction) {
+      updateTransaction(
+        { id: editingTransaction.id, ...data, amount: data.amount.toString() },
+        {
+          onSuccess: () => {
+            handleOpenChange(false);
+            toast({ title: "Updated", description: "Your transaction has been updated." });
+          },
+          onError: () => {
+            toast({ title: "Error", description: "Failed to update transaction.", variant: "destructive" });
+          }
         }
-      }
-    );
+      );
+    } else {
+      createTransaction(
+        { 
+          ...data, 
+          amount: data.amount.toString(), 
+        },
+        {
+          onSuccess: () => {
+            handleOpenChange(false);
+            toast({ title: "Transaction added", description: "Your transaction has been saved." });
+          },
+          onError: () => {
+            toast({ title: "Error", description: "Failed to save transaction.", variant: "destructive" });
+          }
+        }
+      );
+    }
   }
 
   return (
     <>
       <button
-        onClick={() => setOpen(true)}
+        onClick={() => {
+          setOpen(true);
+          if (editingTransaction) {
+            form.reset({
+              amount: Number(editingTransaction.amount),
+              date: new Date(editingTransaction.date),
+              type: editingTransaction.type as any,
+              categoryId: editingTransaction.categoryId,
+              note: editingTransaction.note || "",
+            });
+          }
+        }}
         className="fixed bottom-20 right-4 z-40 h-14 w-14 rounded-full bg-primary text-primary-foreground shadow-lg shadow-primary/25 flex items-center justify-center transition-transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background md:right-8 md:bottom-24"
+        data-testid="button-add-transaction"
       >
         <Plus size={28} />
       </button>
 
-      <Dialog open={open} onOpenChange={setOpen}>
+      <Dialog open={open} onOpenChange={handleOpenChange}>
         <DialogContent className="sm:max-w-[425px] border-white/10 bg-card/95 backdrop-blur-xl">
-          <DialogHeader>
-            <DialogTitle className="text-2xl font-display">New Transaction</DialogTitle>
+          <DialogHeader className="flex items-center justify-between">
+            <DialogTitle className="text-2xl font-display">
+              {editingTransaction ? 'Edit Transaction' : 'New Transaction'}
+            </DialogTitle>
+            {editingTransaction && (
+              <button
+                onClick={() => handleOpenChange(false)}
+                className="p-1 hover:bg-white/10 rounded-lg"
+              >
+                <X size={20} />
+              </button>
+            )}
           </DialogHeader>
           
           <Form {...form}>
@@ -179,9 +230,9 @@ export function TransactionFab() {
                 <Button 
                   type="submit" 
                   className="w-full bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl h-12 text-lg font-medium shadow-lg shadow-primary/20"
-                  disabled={isPending}
+                  disabled={isCreating || isUpdating}
                 >
-                  {isPending ? "Saving..." : "Save Transaction"}
+                  {isCreating || isUpdating ? "Saving..." : editingTransaction ? "Update Transaction" : "Save Transaction"}
                 </Button>
               </div>
             </form>

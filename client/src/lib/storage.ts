@@ -12,6 +12,7 @@ const KEYS = {
   CATEGORIES: 'budget_app_categories',
   TRANSACTIONS: 'budget_app_transactions',
   CURRENCY: 'budget_app_currency',
+  MONTHLY_BUDGETS: 'budget_app_monthly_budgets',
   INIT: 'budget_app_initialized'
 };
 
@@ -46,6 +47,11 @@ class LocalStorageDB {
       }));
       localStorage.setItem(KEYS.TRANSACTIONS, JSON.stringify(serializedTransactions));
       localStorage.setItem(KEYS.CURRENCY, 'INR');
+      // Default monthly budget: 30,000
+      const defaultBudgets = {
+        '2024-03': 30000,
+      };
+      localStorage.setItem(KEYS.MONTHLY_BUDGETS, JSON.stringify(defaultBudgets));
       localStorage.setItem(KEYS.INIT, 'true');
     }
   }
@@ -149,6 +155,24 @@ class LocalStorageDB {
     }));
     localStorage.setItem(KEYS.TRANSACTIONS, JSON.stringify(toStore));
   }
+
+  // --- Monthly Budgets ---
+  async getMonthlyBudget(yearMonth: string): Promise<number> {
+    await new Promise(resolve => setTimeout(resolve, 300));
+    const data = localStorage.getItem(KEYS.MONTHLY_BUDGETS);
+    if (!data) return 30000; // Default budget
+    const budgets = JSON.parse(data);
+    return budgets[yearMonth] || 30000;
+  }
+
+  async setMonthlyBudget(yearMonth: string, limit: number): Promise<number> {
+    await new Promise(resolve => setTimeout(resolve, 300));
+    const data = localStorage.getItem(KEYS.MONTHLY_BUDGETS);
+    const budgets = data ? JSON.parse(data) : {};
+    budgets[yearMonth] = limit;
+    localStorage.setItem(KEYS.MONTHLY_BUDGETS, JSON.stringify(budgets));
+    return limit;
+  }
 }
 
 export const db = new LocalStorageDB();
@@ -175,4 +199,12 @@ export function formatAmount(amount: number, currencyCode?: string): string {
   const code = currencyCode || getCurrency();
   const currency = CURRENCIES[code as keyof typeof CURRENCIES];
   return `${currency.symbol}${amount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+}
+
+export async function getMonthlyBudget(yearMonth: string): Promise<number> {
+  return db.getMonthlyBudget(yearMonth);
+}
+
+export async function setMonthlyBudget(yearMonth: string, limit: number): Promise<number> {
+  return db.setMonthlyBudget(yearMonth, limit);
 }

@@ -1,12 +1,14 @@
 import { useState } from "react";
-import { useTransactions } from "@/hooks/use-transactions";
+import { useTransactions, useDeleteTransaction } from "@/hooks/use-transactions";
 import { useCategories } from "@/hooks/use-categories";
 import { BottomNav } from "@/components/bottom-nav";
 import { TransactionFab } from "@/components/transaction-fab";
 import { format } from "date-fns";
-import { Search, Filter, ShoppingCart, Home, Briefcase, Film, Coffee, Car, Heart, Zap, AlertCircle } from "lucide-react";
+import { Search, Filter, ShoppingCart, Home, Briefcase, Film, Coffee, Car, Heart, Zap, AlertCircle, Edit2, Trash2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { clsx } from "clsx";
+import { useToast } from "@/hooks/use-toast";
+import { formatAmount } from "@/lib/storage";
 
 const ICON_MAP: Record<string, any> = {
   "shopping-cart": ShoppingCart,
@@ -24,6 +26,8 @@ export default function TransactionsPage() {
   const { data: transactions, isLoading } = useTransactions();
   const { data: categories } = useCategories();
   const [search, setSearch] = useState("");
+  const { mutate: deleteTransaction } = useDeleteTransaction();
+  const { toast } = useToast();
 
   const filteredTransactions = transactions
     ?.filter(t => 
@@ -85,25 +89,41 @@ export default function TransactionsPage() {
                     <div 
                       key={t.id}
                       className="group flex items-center justify-between p-3 rounded-xl bg-card border border-white/5 hover:border-white/10 transition-colors"
+                      data-testid={`transaction-item-${t.id}`}
                     >
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-3 flex-1">
                         <div 
                           className="w-10 h-10 rounded-full flex items-center justify-center text-white text-opacity-90 shadow-sm"
                           style={{ backgroundColor: isIncome ? 'var(--primary)' : (category?.color || '#333') }}
                         >
                           <Icon size={18} />
                         </div>
-                        <div>
+                        <div className="flex-1">
                           <p className="font-medium text-sm text-white">{category?.name || 'Uncategorized'}</p>
                           {t.note && <p className="text-xs text-muted-foreground truncate max-w-[150px]">{t.note}</p>}
                         </div>
                       </div>
-                      <span className={clsx(
-                        "font-mono font-medium",
-                        isIncome ? "text-primary" : "text-white"
-                      )}>
-                        {isIncome ? "+" : "-"}${Number(t.amount).toLocaleString()}
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className={clsx(
+                          "font-mono font-medium min-w-[80px] text-right",
+                          isIncome ? "text-primary" : "text-white"
+                        )}>
+                          {isIncome ? "+" : "-"}{formatAmount(Number(t.amount))}
+                        </span>
+                        <button
+                          onClick={() => {
+                            deleteTransaction(t.id, {
+                              onSuccess: () => {
+                                toast({ title: "Deleted", description: "Transaction has been removed." });
+                              }
+                            });
+                          }}
+                          className="opacity-0 group-hover:opacity-100 p-1.5 hover:bg-red-500/10 rounded-lg transition-all"
+                          data-testid={`button-delete-transaction-${t.id}`}
+                        >
+                          <Trash2 size={16} className="text-red-400" />
+                        </button>
+                      </div>
                     </div>
                   );
                 })}
