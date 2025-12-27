@@ -1,0 +1,15 @@
+.pin-lock-root{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,rgba(0,0,0,0.4),rgba(0,0,0,0.6));z-index:9999}
+.pin-card{background:#fff;color:#111;padding:24px;border-radius:14px;box-shadow:0 8px 24px rgba(0,0,0,0.3);width:320px;max-width:92%;text-align:center}
+.lock-icon{font-size:40px;margin-bottom:8px}
+.pin-dots{display:flex;gap:10px;justify-content:center;margin:12px 0}
+.dot{width:14px;height:14px;border-radius:50%;border:2px solid #ccc}
+.dot.filled{background:#111;border-color:#111}
+.dot.optional{opacity:0.6}
+.pin-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.pad-btn{padding:12px;border-radius:8px;border:1px solid #e5e7eb;background:#f8fafc;font-size:16px}
+.pad-btn.submit{grid-column:span 2;background:#111;color:#fff}
+.pad-btn.back{background:#fff}
+.visually-hidden{position:absolute;left:-9999px}
+.pin-error{color:#b91c1c;margin-top:8px}
+.shake{animation:shake 600ms}
+@keyframes shake{0%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-6px)}80%{transform:translateX(6px)}100%{transform:translateX(0)}}
