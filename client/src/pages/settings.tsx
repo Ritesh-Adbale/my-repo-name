@@ -8,6 +8,7 @@ import { CURRENCIES, getCurrency, setCurrency, getMonthlyBudget, setMonthlyBudge
 import { BottomNav } from "@/components/bottom-nav";
 import { format } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
+import { CategoryManager } from "@/components/category-manager";
 
 export default function SettingsPage() {
   const [, setLocation] = useLocation();
@@ -123,6 +124,12 @@ export default function SettingsPage() {
               ))
             )}
           </div>
+        </div>
+
+        {/* Categories Management */}
+        <div>
+          <h2 className="text-lg font-semibold mb-4 text-white/80">Categories</h2>
+          <CategoryManager />
         </div>
 
         {/* About */}
