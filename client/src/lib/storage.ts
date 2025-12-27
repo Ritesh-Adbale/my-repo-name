@@ -11,6 +11,7 @@ import {
 const KEYS = {
   CATEGORIES: 'budget_app_categories',
   TRANSACTIONS: 'budget_app_transactions',
+  CURRENCY: 'budget_app_currency',
   INIT: 'budget_app_initialized'
 };
 
@@ -44,6 +45,7 @@ class LocalStorageDB {
         date: t.date.toISOString()
       }));
       localStorage.setItem(KEYS.TRANSACTIONS, JSON.stringify(serializedTransactions));
+      localStorage.setItem(KEYS.CURRENCY, 'INR');
       localStorage.setItem(KEYS.INIT, 'true');
     }
   }
@@ -150,3 +152,27 @@ class LocalStorageDB {
 }
 
 export const db = new LocalStorageDB();
+
+// Currency utilities
+export const CURRENCIES = {
+  INR: { code: 'INR', symbol: '₹', name: 'Indian Rupees' },
+  USD: { code: 'USD', symbol: '$', name: 'US Dollars' },
+  EUR: { code: 'EUR', symbol: '€', name: 'Euros' },
+  GBP: { code: 'GBP', symbol: '£', name: 'British Pounds' },
+};
+
+export function getCurrency(): string {
+  if (typeof window === 'undefined') return 'INR';
+  return localStorage.getItem(KEYS.CURRENCY) || 'INR';
+}
+
+export function setCurrency(code: string): void {
+  if (typeof window === 'undefined') return;
+  localStorage.setItem(KEYS.CURRENCY, code);
+}
+
+export function formatAmount(amount: number, currencyCode?: string): string {
+  const code = currencyCode || getCurrency();
+  const currency = CURRENCIES[code as keyof typeof CURRENCIES];
+  return `${currency.symbol}${amount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+}

@@ -15,6 +15,23 @@ export const errorSchemas = {
 };
 
 export const api = {
+  settings: {
+    getCurrency: {
+      method: 'GET' as const,
+      path: '/api/settings/currency',
+      responses: {
+        200: z.custom<{ code: string; symbol: string; name: string }>(),
+      },
+    },
+    setCurrency: {
+      method: 'POST' as const,
+      path: '/api/settings/currency',
+      input: z.object({ code: z.string() }),
+      responses: {
+        200: z.custom<{ code: string; symbol: string; name: string }>(),
+      },
+    },
+  },
   categories: {
     list: {
       method: 'GET' as const,

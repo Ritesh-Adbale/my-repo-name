@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { Home, List, PieChart } from "lucide-react";
+import { Home, List, PieChart, Settings } from "lucide-react";
 import { clsx } from "clsx";
 
 export function BottomNav() {
@@ -9,6 +9,7 @@ export function BottomNav() {
     { href: "/", icon: Home, label: "Budget" },
     { href: "/transactions", icon: List, label: "Transactions" },
     { href: "/insights", icon: PieChart, label: "Insights" },
+    { href: "/settings", icon: Settings, label: "Settings" },
   ];
 
   return (

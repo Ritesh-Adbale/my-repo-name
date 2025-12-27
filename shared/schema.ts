@@ -44,3 +44,22 @@ export type UpdateTransactionRequest = Partial<InsertTransaction>;
 // Response types
 export type CategoryResponse = Category;
 export type TransactionResponse = Transaction;
+
+// === CURRENCY TYPES ===
+export const SUPPORTED_CURRENCIES = {
+  INR: { code: 'INR', symbol: '₹', name: 'Indian Rupees' },
+  USD: { code: 'USD', symbol: '$', name: 'US Dollars' },
+  EUR: { code: 'EUR', symbol: '€', name: 'Euros' },
+  GBP: { code: 'GBP', symbol: '£', name: 'British Pounds' },
+} as const;
+
+export type CurrencyCode = keyof typeof SUPPORTED_CURRENCIES;
+
+export interface CurrencyPreference {
+  code: CurrencyCode;
+  symbol: string;
+  name: string;
+}
+
+export type GetCurrencyResponse = CurrencyPreference;
+export type SetCurrencyRequest = { code: CurrencyCode };

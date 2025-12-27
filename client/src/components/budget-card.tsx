@@ -1,5 +1,6 @@
 import { clsx } from "clsx";
 import { ArrowUpRight, ArrowDownRight, Wallet } from "lucide-react";
+import { formatAmount } from "@/lib/storage";
 
 interface BudgetCardProps {
   balance: number;
@@ -19,7 +20,7 @@ export function BudgetCard({ balance, income, expenses }: BudgetCardProps) {
           <span className="text-sm font-medium text-muted-foreground tracking-wider uppercase">Total Balance</span>
         </div>
         <h2 className="text-4xl font-bold font-mono text-white mb-8 tracking-tight">
-          ${balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+          {formatAmount(balance)}
         </h2>
 
         <div className="grid grid-cols-2 gap-4">
@@ -31,7 +32,7 @@ export function BudgetCard({ balance, income, expenses }: BudgetCardProps) {
               <span className="text-xs font-semibold uppercase">Income</span>
             </div>
             <p className="text-lg font-mono font-medium text-white/90">
-              ${income.toLocaleString()}
+              {formatAmount(income)}
             </p>
           </div>
           
@@ -43,7 +44,7 @@ export function BudgetCard({ balance, income, expenses }: BudgetCardProps) {
               <span className="text-xs font-semibold uppercase">Expenses</span>
             </div>
             <p className="text-lg font-mono font-medium text-white/90">
-              ${expenses.toLocaleString()}
+              {formatAmount(expenses)}
             </p>
           </div>
         </div>

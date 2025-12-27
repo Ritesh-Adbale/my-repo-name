@@ -10,6 +10,9 @@ import {
 import { eq, desc } from "drizzle-orm";
 
 export interface IStorage {
+  getCurrency(): Promise<string>;
+  setCurrency(code: string): Promise<string>;
+
   getCategories(): Promise<Category[]>;
   createCategory(category: InsertCategory): Promise<Category>;
   updateCategory(id: number, category: Partial<InsertCategory>): Promise<Category>;
@@ -22,6 +25,14 @@ export interface IStorage {
 }
 
 export class DatabaseStorage implements IStorage {
+  async getCurrency(): Promise<string> {
+    return 'INR';
+  }
+
+  async setCurrency(code: string): Promise<string> {
+    return code;
+  }
+
   async getCategories(): Promise<Category[]> {
     return await db.select().from(categories);
   }

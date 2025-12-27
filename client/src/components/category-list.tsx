@@ -5,6 +5,7 @@ import { format } from "date-fns";
 import { ArrowRight, ShoppingCart, Home, Briefcase, Film, Coffee, Car, Heart, Zap, AlertCircle } from "lucide-react";
 import { clsx } from "clsx";
 import { Link } from "wouter";
+import { formatAmount } from "@/lib/storage";
 
 const ICON_MAP: Record<string, any> = {
   "shopping-cart": ShoppingCart,
@@ -81,7 +82,7 @@ export function CategoryList() {
                   <div className="flex justify-between items-baseline mb-1">
                     <h4 className="font-medium text-white truncate pr-2">{cat.name}</h4>
                     <span className="text-sm font-mono text-muted-foreground">
-                      ${spent.toLocaleString()} <span className="text-xs text-white/30">/ ${limit.toLocaleString()}</span>
+                      {formatAmount(spent)} <span className="text-xs text-white/30">/ {formatAmount(limit)}</span>
                     </span>
                   </div>
                 </div>
@@ -100,7 +101,7 @@ export function CategoryList() {
               {isOverBudget && (
                 <p className="mt-2 text-xs text-red-400 font-medium flex items-center gap-1">
                   <AlertCircle size={12} />
-                  Over budget by ${(spent - limit).toFixed(0)}
+                  Over budget by {formatAmount(spent - limit)}
                 </p>
               )}
             </div>

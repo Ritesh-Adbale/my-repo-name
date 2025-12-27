@@ -9,6 +9,32 @@ export async function registerRoutes(
   app: Express
 ): Promise<Server> {
 
+  // Settings Routes
+  app.get(api.settings.getCurrency.path, async (req, res) => {
+    const currencyCode = await storage.getCurrency();
+    const { SUPPORTED_CURRENCIES } = await import("@shared/schema");
+    const currency = SUPPORTED_CURRENCIES[currencyCode as keyof typeof SUPPORTED_CURRENCIES];
+    res.json({ code: currency.code, symbol: currency.symbol, name: currency.name });
+  });
+
+  app.post(api.settings.setCurrency.path, async (req, res) => {
+    try {
+      const input = api.settings.setCurrency.input.parse(req.body);
+      const currencyCode = await storage.setCurrency(input.code);
+      const { SUPPORTED_CURRENCIES } = await import("@shared/schema");
+      const currency = SUPPORTED_CURRENCIES[currencyCode as keyof typeof SUPPORTED_CURRENCIES];
+      res.json({ code: currency.code, symbol: currency.symbol, name: currency.name });
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        return res.status(400).json({
+          message: err.errors[0].message,
+          field: err.errors[0].path.join('.'),
+        });
+      }
+      throw err;
+    }
+  });
+
   // Categories Routes
   app.get(api.categories.list.path, async (req, res) => {
     const categories = await storage.getCategories();
